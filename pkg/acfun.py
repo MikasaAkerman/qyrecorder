@@ -1,3 +1,4 @@
+import datetime
 import time
 import json
 import os
@@ -96,10 +97,12 @@ class AcFun(object):
             raise Exception(resp["error_msg"])
 
         res = json.loads(resp["data"]["videoPlayRes"])
+        print("chose media type", res["liveAdaptiveManifest"][0]["adaptationSet"]["representation"][-1]["name"])
         return res["liveAdaptiveManifest"][0]["adaptationSet"]["representation"][-1]["url"]
 
     def record(self, url):
-        self.start_time = time.time()
+        print("start recording at", time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+        self.start_time = datetime.datetime.now()
         if os.path.isabs(self.path):
             file_path = os.path.join(os.curdir, self.path,
                                      time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime()) + ".flv")
@@ -113,6 +116,7 @@ class AcFun(object):
         with open(file_path, 'wb') as file:
             for data in response.iter_content(block_size):
                 file.write(data)
+                print('\r recording length %ds.' % (datetime.datetime.now() - self.start_time).seconds, end="")
 
     def try_record(self):
         try:
@@ -123,4 +127,4 @@ class AcFun(object):
         except Exception as e:
             print("try to record AcFun room {} failed. because {}".format(self.room, e))
             return
-        print("record success, length {}".format(time.time() - self.start_time))
+        print("record success, length %ds" % (datetime.datetime.now() - self.start_time).seconds)
