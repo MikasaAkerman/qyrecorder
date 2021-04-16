@@ -112,11 +112,15 @@ class AcFun(object):
 
         response = self.session.get(url, stream=True)
 
-        block_size = 1024  # 1 Kib
+        block_size = 1024 * 4  # 4 Kib
         with open(file_path, 'wb') as file:
             for data in response.iter_content(block_size):
                 file.write(data)
                 print('\r recording length %ds.' % (datetime.datetime.now() - self.start_time).seconds, end="")
+                if file.tell() > 15 * 1024 * 1024 * 1024:  # single file max size: 15G
+                    print('\n rotate file.')
+                    return
+            print("\n")
 
     def try_record(self):
         try:
@@ -126,5 +130,6 @@ class AcFun(object):
             self.record(url)
         except Exception as e:
             print("try to record AcFun room {} failed. because {}".format(self.room, e))
-            return
-        print("record success, length %ds" % (datetime.datetime.now() - self.start_time).seconds)
+            return False
+        print("record success.")
+        return True

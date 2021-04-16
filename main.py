@@ -11,9 +11,8 @@ def start_recorder(room, path):
     while True:
         session = requests.session()
         recorder = AcFun(session, room, path)
-        recorder.try_record()
-
-        time.sleep(5 * 60)  # 5分钟执行一次
+        if not recorder.try_record():
+            time.sleep(5 * 60)  # 5分钟执行一次
 
 
 if __name__ == '__main__':
