@@ -8,9 +8,3 @@ services:
     container_name: qyrecorder
     volumes:
       - ./videos:/app/videos
-    networks:
-     - mysql_db_network
-
-networks:
-  mysql_db_network:
-    external: true
